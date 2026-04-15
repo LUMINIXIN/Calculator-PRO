@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora PLUS</title>
+
+<style>
+:root{
+    --bg:#0f0f0f;
+    --glass:rgba(255,255,255,0.05);
+    --text:#fff;
+    --accent:#ff9800;
+}
+
+body{
+    margin:0;
+    font-family:'Segoe UI',sans-serif;
+    background: radial-gradient(circle at top, #1a1a1a, #000);
+    color:var(--text);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+
+/* CONTAINER */
+.app{
+    display:flex;
+    gap:20px;
+}
+
+/* CALCULADORA */
+.phone{
+    width:320px;
+    padding:20px;
+    border-radius:30px;
+    backdrop-filter: blur(20px);
+    background: var(--glass);
+    box-shadow:0 0 40px rgba(0,0,0,0.8);
+}
+
+#display{
+    width:100%;
+    height:80px;
+    font-size:28px;
+    text-align:right;
+    background:transparent;
+    color:white;
+    border:none;
+}
+
+/* BOTÕES */
+.buttons{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:10px;
+}
+
+button{
+    height:55px;
+    border-radius:50%;
+    border:none;
+    font-size:18px;
+    cursor:pointer;
+    transition:0.2s;
+}
+
+button:hover{transform:scale(1.1);}
+
+.num{background:#2a2a2a;color:white;}
+.op{background:var(--accent);}
+.func{background:#555;}
+
+.zero{grid-column:span 2;border-radius:30px;}
+
+/* HISTÓRICO */
+.history{
+    width:200px;
+    height:400px;
+    overflow-y:auto;
+    padding:10px;
+    border-radius:15px;
+    background:var(--glass);
+    font-size:14px;
+}
+
+.history div{
+    margin:5px 0;
+    opacity:0.7;
+}
+
+/* CURSOR MENU */
+.cursor-menu{
+    position:fixed;
+    bottom:10px;
+    right:10px;
+}
+.cursor-menu button{
+    margin:3px;
+    border-radius:10px;
+    height:30px;
+}
+
+/* MOBILE */
+@media(max-width:800px){
+    .history{display:none;}
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<div class="phone">
+<input id="display" disabled>
+
+<div class="buttons">
+<button class="func" onclick="limpar()">C</button>
+<button class="func" onclick="apagar()">⌫</button>
+<button class="func" onclick="raiz()">√</button>
+<button class="op" onclick="add('/')">÷</button>
+
+<button class="num" onclick="add('7')">7</button>
+<button class="num" onclick="add('8')">8</button>
+<button class="num" onclick="add('9')">9</button>
+<button class="op" onclick="add('*')">×</button>
+
+<button class="num" onclick="add('4')">4</button>
+<button class="num" onclick="add('5')">5</button>
+<button class="num" onclick="add('6')">6</button>
+<button class="op" onclick="add('-')">−</button>
+
+<button class="num" onclick="add('1')">1</button>
+<button class="num" onclick="add('2')">2</button>
+<button class="num" onclick="add('3')">3</button>
+<button class="op" onclick="add('+')">+</button>
+
+<button class="num zero" onclick="add('0')">0</button>
+<button class="num" onclick="add('.')">.</button>
+<button class="op" onclick="calcular()">=</button>
+</div>
+</div>
+
+<div class="history" id="history">
+<h4>Histórico</h4>
+</div>
+
+</div>
+
+<div class="cursor-menu">
+<button onclick="setCursor('default')">Normal</button>
+<button onclick="setCursor('crosshair')">Mira</button>
+<button onclick="setCursor('pointer')">Pointer</button>
+</div>
+
+<script>
+
+// DISPLAY
+let display=document.getElementById("display");
+let historyDiv=document.getElementById("history");
+
+// ADICIONAR
+function add(v){display.value+=v;}
+
+// LIMPAR
+function limpar(){display.value="";}
+
+// APAGAR
+function apagar(){display.value=display.value.slice(0,-1);}
+
+// RAIZ
+function raiz(){
+    try{
+        let val=Math.sqrt(eval(display.value));
+        addHistory(display.value + " √ = " + val);
+        display.value=val;
+    }catch{
+        display.value="Erro";
+    }
+}
+
+// CALCULAR
+function calcular(){
+    try{
+        let conta=display.value.replace('%','/100');
+        let resultado=eval(conta);
+        addHistory(conta + " = " + resultado);
+        display.value=resultado;
+    }catch{
+        display.value="Erro";
+    }
+}
+
+// HISTÓRICO
+function addHistory(txt){
+    let div=document.createElement("div");
+    div.textContent=txt;
+    historyDiv.appendChild(div);
+}
+
+// TECLADO
+document.addEventListener("keydown",e=>{
+    if(!isNaN(e.key)) add(e.key);
+    if(["+","-","*","/","."].includes(e.key)) add(e.key);
+    if(e.key==="Enter") calcular();
+    if(e.key==="Backspace") apagar();
+});
+
+// CURSOR
+function setCursor(c){
+    document.body.style.cursor=c;
+}
+
+// EASTER EGGS
+let segredo="";
+document.addEventListener("keydown",e=>{
+    segredo+=e.key;
+
+    if(segredo.includes("dev")){
+        document.body.style.background="linear-gradient(red,black)";
+        alert("Modo DEV 🔥");
+        segredo="";
+    }
+
+    if(segredo.includes("777")){
+        display.value="JACKPOT 🎰";
+        segredo="";
+    }
+});
+
+</script>
+
+</body>
+</html>
